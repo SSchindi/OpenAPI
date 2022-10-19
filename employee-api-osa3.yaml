@@ -1,0 +1,313 @@
+openapi: 3.0.1
+info:
+  title: EmployeeAPI
+  description: >-
+    <b>General:</b><br>This API provides information about units and
+    employees.<br><b>Authorization:</b><br>This is a protected API. Therefore,
+    all requests must contain a authorization header providing a valid access
+    token.<br>Please request the client application credentials  <a
+    href='https://jira.swisscom.com/servicedesk/customer/portal/10/create/432'
+    target='_blanc'>here</a>.<br><br>
+  contact:
+    name: COPAS
+    email: Info.OA@swisscom.com
+  version: '2.0'
+paths:
+  /api/employee:
+    get:
+      tags:
+        - Employee
+      summary: >-
+        Endpoint for retrieving Employees data. Supports OData filtering,
+        sorting and pagination (see
+        https://www.odata.org/documentation/odata-version-2-0/uri-conventions/)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeFilteredDataResponse'
+  /api/employee/{employeeNr}:
+    get:
+      tags:
+        - Employee
+      summary: Endpoint for retrieving Employee data.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+  /api/unit:
+    get:
+      tags:
+        - Unit
+      summary: "Endpoint for retrieving Units data. Supports OData filtering, sorting and pagination\r\n(see https://www.odata.org/documentation/odata-version-2-0/uri-conventions/)"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleUnitFilteredDataResponse'
+  /api/unit/{unitCode}:
+    get:
+      tags:
+        - Unit
+      summary: Endpoint for retrieving Units data.
+      parameters:
+        - name: unitCode
+          in: path
+          description: Unit code
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkedUnit'
+  /api/agileobjects:
+    get:
+      tags:
+        - AgileObject
+      summary: Endpoint for retrieving AgileObject data.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AgileObjectRefDto'
+  /Lists/CustomPortraits/{employeeNr}:
+    get:
+      tags:
+        - Profile Image
+      summary: Endpoint for retrieving ProfileImage.
+      responses:
+        '200':
+          description: Success
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+components:
+  schemas:
+    Employee:
+      type: object
+      properties:
+        employeeNr:
+          type: string
+          nullable: false
+          x-faker: 
+            random.numeric:
+              - 7
+        ntLogin:
+          type: string
+          nullable: false
+          x-faker: 
+            random.alpha:
+              - {count: 8, upcase: true} 
+        unitCode:
+          type: integer
+          format: int32
+          nullable: false
+          x-faker: datatype.number
+        firstName:
+          type: string
+          nullable: false
+          x-faker: name.firstName
+        lastName:
+          type: string
+          nullable: false
+          x-faker: name.lastName
+        unitName:
+          type: string
+          nullable: false
+          x-faker: 
+            helpers.replaceSymbols:
+              - '???-???-???'
+        createdDate:
+          type: string
+          format: date-time
+          nullable: false
+          x-faker: date.past
+        modifiedDate:
+          type: string
+          format: date-time
+          nullable: false
+          x-faker: date.past
+        modifiedBy:
+          type: string
+          nullable: false
+          x-faker: internet.userName
+      additionalProperties: false
+    EmployeeFilteredDataResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Employee'
+          nullable: false
+        total:
+          type: integer
+          format: int64
+      additionalProperties: false
+    LinkedUnit:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        name:
+          type: string
+          nullable: false
+          x-faker: 
+            random.alpha:
+              - {count: 3, upcase: true} 
+        longName:
+          type: string
+          nullable: false
+          x-faker: 
+            helpers.replaceSymbols:
+              - '???-???-???'
+        description:
+          type: string
+          nullable: false
+        isStab:
+          type: boolean
+          nullable: false
+        costCenter:
+          type: string
+          nullable: false
+        unitChiefNr:
+          type: string
+          nullable: false
+        parentUnitCode:
+          type: integer
+          format: int32
+          nullable: false
+        createdDate:
+          type: string
+          format: date-time
+          nullable: false
+        modifiedDate:
+          type: string
+          format: date-time
+          nullable: false
+        modifiedBy:
+          type: string
+          nullable: false
+        parentUnit:
+          $ref: '#/components/schemas/SingleUnit'
+        childUnits:
+          type: array
+          items:
+            $ref: '#/components/schemas/SingleUnit'
+          nullable: true
+      additionalProperties: false
+    SingleUnit:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        name:
+          type: string
+          nullable: false
+          x-faker: 
+            random.alpha:
+              - {count: 3, upcase: true} 
+        longName:
+          type: string
+          nullable: false
+          x-faker: 
+            helpers.replaceSymbols:
+              - '???-???-???'
+        description:
+          type: string
+          nullable: false
+        isStab:
+          type: boolean
+          nullable: false
+        costCenter:
+          type: string
+          nullable: false
+        unitChiefNr:
+          type: string
+          nullable: false
+        parentUnitCode:
+          type: integer
+          format: int32
+          nullable: false
+        createdDate:
+          type: string
+          format: date-time
+          nullable: false
+        modifiedDate:
+          type: string
+          format: date-time
+          nullable: false
+        modifiedBy:
+          type: string
+          nullable: false
+      additionalProperties: false
+    SingleUnitFilteredDataResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SingleUnit'
+          nullable: false
+        total:
+          type: integer
+          format: int64
+      additionalProperties: false
+    AgileObjectRefDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          x-faker: 
+            random.numeric:
+              - 6
+        uuid:
+          type: string
+          format: uuid
+          x-faker: datatype.uuid
+        shortName:
+          type: string
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        agileType:
+          $ref: '#/components/schemas/AgileTypeDto'
+      additionalProperties: false
+    AgileTypeDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          x-faker: 
+            random.numeric:
+              - 6
+        name:
+          type: string
+          nullable: false
+        color:
+          type: string
+          nullable: false
+      additionalProperties: false
